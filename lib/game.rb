@@ -1,11 +1,9 @@
 #view
 class Game
-  attr_accessor :board, :turn_num, :players, :player1, :player2, :winner
+  attr_accessor :board, :players, :player1, :player2, :winner
   def initialize
     @board = Board.new
-    @turn_num = 0
-    @players = [@player1, @player2]
-    @winner = nil
+    # @players = [@player1, @player2]
   end
 
   def greetings
@@ -18,16 +16,38 @@ class Game
 
   def pick_players
     puts "First player is:"
-    player_types.each_with_index {|type, i| p "#{i}. #{type}"}
-    @player1 = Player.new(board, gets.chomp.to_i)
+    @player1 = Player.new("Player 1", board, pick_type)
     puts "Second player is:"
-    player_types.each_with_index {|type, i| p "#{i}. #{type}"}
-    @player2 = Player.new(board, gets.chomp.to_i)
+    @player2 = Player.new("Player 2", board, pick_type)
     representation_choices
+  end
+
+  def pick_type
+    display_types
+    choice = gets.chomp.downcase
+    if choice[0] == 'm'
+      if choice == 'man'
+        return 0
+      elsif choice == 'machine'
+        return 1
+      else
+        puts "Sorry I didn't catch that."
+        pick_type
+      end
+    elsif choice == "0" || choice == "1"
+      return choice.to_i
+    else
+      puts "Sorry I didn't catch that."
+      pick_type
+    end
   end
 
   def player_types
     ["man", "machine"]
+  end
+
+  def display_types
+    player_types.each_with_index {|type, i| p "#{i}. #{type}"}
   end
 
   def representations
@@ -69,16 +89,29 @@ class Game
     welcome
     puts render_board
     pick_players
-    until board.game_is_over || board.tie
-      play
-      render_board
-    end
-    puts "Game over"
+    puts render_board
+    play until board.game_is_won || board.game_is_over
+    end_message
   end
 
   def play
-      @turn_num.even? ? player1.move : player2.move
-      @turn_num += 1
+    board.turn_num.even? ? player1.move : player2.move
+    puts render_board
+  end
+
+  def end_message
+    if board.tie
+      puts "Tied game!"
+    else
+      board.winner = board.turn_num.even? ? player2 : player1
+      puts "#{board.winner.name} wins!"
+    end
+    play_again?
+  end
+
+  def play_again?
+    # not good practice to open a new instance of object within?
+    Game.new
   end
 
 end

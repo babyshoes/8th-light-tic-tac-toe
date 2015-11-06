@@ -27,13 +27,14 @@ class Player
   end
 
   def human_move
-    puts "What's your move? [0-8]"
+    puts "What's your move? Select square number."
     pick_square
   end
 
   def pick_square
     id = gets.chomp.to_i
-    (0..8).include? id && board.squares[id].occupied ? human_move : occupy_square(id)
+    board.squares.flatten.include? id
+    # (0..8).include? id && board.squares[id].occupied ? human_move : occupy_square(id)
   end
 
   def occupy_square(id, player = self, board_state = board)
@@ -77,7 +78,7 @@ class Player
     # moves = []
     board_state = board_state.make_copy
     # binding.pry
-    board_state.available_spaces.each do |possible_move|
+    board_state.available_spaces(squares).each do |possible_move|
       binding.pry
       player = depth.even? ? self.opponent : self
       occupy_square(possible_move.number, player, board_state)

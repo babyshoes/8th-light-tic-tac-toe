@@ -1,45 +1,65 @@
 class Board
+  attr_reader :dimension
   attr_accessor :squares, :turn_num, :copy, :winner
 
-  def initialize(squares = [], turn_num = 0)
+  def initialize(dimension = 3, squares = [], turn_num = 0)
+    @dimension = dimension
     @squares = squares
     @turn_num = turn_num
     populate_board if squares.empty?
   end
 
-  def winning
-    [ [squares[0], squares[1], squares[2]],
-      [squares[3], squares[4], squares[5]],
-      [squares[6], squares[7], squares[8]],
-      [squares[0], squares[3], squares[6]],
-      [squares[1], squares[4], squares[7]],
-      [squares[2], squares[5], squares[8]],
-      [squares[0], squares[4], squares[8]],
-      [squares[2], squares[4], squares[6]] ]
+  def populate_board
+    dimension.times { |i| squares << make_row(i) }
   end
 
-  def populate_board
-    (0..8).each do |num|
-      squares << Square.new(num)
+  def make_square(row_num, i)
+    (row_num * dimension) + i
+  end
+
+  def make_row(id)
+    row = []
+    dimension.times { |i| row << make_square(id, i)}
+    row
+  end
+
+  def horizontal_win
+    squares.find do |row|
+      row.uniq.length == 1
     end
+  end
+
+  def vertical_win
+    squares.first.each_with_index.find do |square, y|
+      squares_to_compare = []
+      dimension.times {|x| squares_to_compare << squares[x][y]}
+      squares_to_compare.uniq.length == 1
+    end
+  end
+
+  # CALLBACK HERE?
+  def diagonal_win
+    diagonal_win_right || diagonal_win_left
+  end
+
+  def diagonal_win_right
+    squares_to_compare = []
+    dimension.times {|x| squares_to_compare << squares[x][x]}
+    squares_to_compare.uniq.length == 1
+  end
+
+  def diagonal_win_left
+    squares_to_compare = []
+    dimension.times {|x| squares_to_compare << squares[x][dimension - x - 1]}
+    squares_to_compare.uniq.length == 1
   end
 
   def game_is_over
-    squares.all? { |square| square.occupied }
+    squares.all? { |row| row.all? {|square| square.is_a? String } }
   end
 
   def game_is_won
-    winning.find do |combo|
-      combo[0].occupied && combo[0].occupied == combo[1].occupied && combo[1].occupied == combo[2].occupied
-    end
-    # [b[0], b[1], b[2]].uniq.length == 1 ||
-    # [b[3], b[4], b[5]].uniq.length == 1 ||
-    # [b[6], b[7], b[8]].uniq.length == 1 ||
-    # [b[0], b[3], b[6]].uniq.length == 1 ||
-    # [b[1], b[4], b[7]].uniq.length == 1 ||
-    # [b[2], b[5], b[8]].uniq.length == 1 ||
-    # [b[0], b[4], b[8]].uniq.length == 1 ||
-    # [b[2], b[4], b[6]].uniq.length == 1
+    diagonal_win || vertical_win || horizontal_win
   end
 
   def tie
@@ -47,16 +67,16 @@ class Board
   end
 
   def make_copy
-    copy_of_squares = self.squares.map {|square| square.dup}
-    Board.new(copy_of_squares, self.turn_num)
+    copy_of_squares = squares.map {|row| row.map {|square| square.dup}}
+    Board.new(board.copy_of_squares, board.turn_num)
   end
 
-  def available_spaces
-    squares.select { |square| !square.occupied }
+  def available_spaces(set)
+    set.select { |square| !square.occupied }
   end
 
   def available_corners
-    corners = [squares[0], squares[2], squares[6], squares[8]]
-    corners.select { |square| !square.occupied }
+    corners = [squares[0][0], squares[0][dimension - 1], squares[dimension - 1][0], squares[dimension - 1][dimension - 1]]
+    available_spaces(corners)
   end
 end

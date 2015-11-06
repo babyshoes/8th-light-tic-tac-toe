@@ -16,6 +16,7 @@ describe 'Board' do
       expect(larger_board.squares).to be_a Array
       expect(larger_board.squares.length).to eq(larger_board.dimension)
       expect(larger_board.squares.first.length).to eq(larger_board.dimension)
+      expect(larger_board.squares.flatten.count).to eq(larger_board.dimension * larger_board.dimension)
     end
   end
 
@@ -37,7 +38,7 @@ describe 'Board' do
     }
     let(:horizontal_win_board) {
       hwb = Board.new
-      hwb.squares = [["O", "O", "O"], [3, "X", "O"], ["X", "O", "O"]]
+      hwb.squares = [["O", "O", "O"], [3, "X", "O"], [6, "O", 8]]
       hwb
     }
     let(:vertical_win_board) {
@@ -45,29 +46,47 @@ describe 'Board' do
       vwb.squares = [["O", "X", "O"], [3, "X", "O"], ["X", "X", "O"]]
       vwb
     }
-    describe '#game_is_over'
-      it 'returns true when all spaces are occupied' do
-        expect(full_board.game_is_over).to eq(true)
-      end
-      it 'returns false if even one square can be occupied' do
-        expect(missing.game_is_over).to eq(false)
-      end
 
-    describe '#game_is_won'
-      it 'returns true when there is a diagonal win' do
-        expect(diagonal_win_board.game_is_won).to eq(true)
-      end
-      it 'returns true when there is a horizontal win' do
-        expect(horizontal_win_board.game_is_won).to eq(true)
-      end
-      it 'returns true when there is a vertical win' do
-        expect(vertical_win_board.game_is_won).to eq(true)
-      end
-      it 'returns true even if there are unoccupied spaces' do
-        expect(diagonal_win_board.game_is_won).to eq(true)
-      end
-      it 'returns false if all spaces are occupied but there is no winning arrangement' do
-        expect(full_board.game_is_won).to eq(false)
-      end
+    context 'board has end game conditions'
+      describe '#game_is_over'
+        it 'returns true when all spaces are occupied' do
+          expect(full_board.game_is_over).to eq(true)
+        end
+        it 'returns false if even one square can be occupied' do
+          expect(missing.game_is_over).to eq(false)
+        end
+
+      describe '#game_is_won'
+        it 'returns true when there is a diagonal win' do
+          expect(diagonal_win_board.game_is_won).to eq(true)
+        end
+        it 'returns true when there is a horizontal win' do
+          expect(horizontal_win_board.game_is_won).to eq(true)
+        end
+        it 'returns true when there is a vertical win' do
+          expect(vertical_win_board.game_is_won).to eq(true)
+        end
+        it 'returns true even if there are unoccupied spaces' do
+          expect(diagonal_win_board.game_is_won).to eq(true)
+        end
+        it 'returns false if all spaces are occupied but there is no winning arrangement' do
+          expect(full_board.game_is_won).to eq(false)
+        end
+
+    context 'board knows its unoccupied squares'
+      describe 'available_corners'
+        it 'returns an empty array when there are no available corners' do
+          expect(full_board.available_corners.any?).to eq(false)
+        end
+        it 'returns square numbers of available corners' do
+          expect(horizontal_win_board.available_corners).to eq([6, 8])
+        end
+      describe 'available_spaces'
+        it 'returns an empty array when there are no available spaces' do
+          expect(full_board.available_spaces.any?).to eq(false)
+        end
+        it 'returns square numbers of available spaces' do
+          expect(horizontal_win_board.available_spaces).to eq([3, 6, 8])
+        end
 
 end

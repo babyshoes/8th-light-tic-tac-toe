@@ -72,12 +72,16 @@ class Board
     Board.new(board.copy_of_squares, board.turn_num)
   end
 
-  def available_spaces(set)
-    set.select { |square| !square.occupied }
+  def available?(set)
+    set.select { |square| square.is_a? Integer }
+  end
+
+  def available_spaces
+    available?(squares.flatten)
   end
 
   def available_corners
     corners = [squares[0][0], squares[0][dimension - 1], squares[dimension - 1][0], squares[dimension - 1][dimension - 1]]
-    available_spaces(corners)
+    available?(corners)
   end
 end

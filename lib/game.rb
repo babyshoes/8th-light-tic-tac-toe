@@ -2,7 +2,7 @@
 class Game
   attr_accessor :board, :players, :player1, :player2, :winner
   def initialize
-    @board = Board.new
+    @board = Board.new(5)
     # @players = [@player1, @player2]
   end
 
@@ -74,16 +74,40 @@ class Game
   end
 
   def render_board
-    """
-      #{render_square(0)}|#{render_square(1)}|#{render_square(2)}
-      #{render_square(3)}|#{render_square(4)}|#{render_square(5)}
-      #{render_square(6)}|#{render_square(7)}|#{render_square(8)}
-    """
+    i = 0
+    while i < board.dimension
+      puts """
+      #{render_row(i)} """
+      i += 1
+    end
+
+    # """
+    #   #{ board.dimension.times do |i|
+    #       puts render_row(i)
+    #     end }
+    # """
+
+    # """
+    #   #{render_square(0)}|#{render_square(1)}|#{render_square(2)}
+    #   #{render_square(3)}|#{render_square(4)}|#{render_square(5)}
+    #   #{render_square(6)}|#{render_square(7)}|#{render_square(8)}
+    # """
+  end
+
+  def render_row(index)
+    row = board.squares[index]
+    row = row.map do |square|
+      square_str = "#{square}"
+      square_str << " | " unless row.index(square) == row.length - 1
+      square_str
+    end
+    row.join
   end
 
   def render_square(i)
     board.squares[i].occupied ? board.squares[i].occupied : board.squares[i].number
   end
+
 
   def start_game
     welcome

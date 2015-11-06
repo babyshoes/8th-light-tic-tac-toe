@@ -1,3 +1,4 @@
+require 'pry'
 class Board
   attr_reader :dimension
   attr_accessor :squares, :turn_num, :copy, :winner
@@ -59,7 +60,7 @@ class Board
   end
 
   def game_is_won
-    diagonal_win || vertical_win || horizontal_win
+    !!diagonal_win || !!vertical_win || !!horizontal_win
   end
 
   def tie

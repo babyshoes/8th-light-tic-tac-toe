@@ -7,43 +7,58 @@ class Board
     populate_board if squares.empty?
   end
 
-  def winning
-    [ [squares[0], squares[1], squares[2]],
-      [squares[3], squares[4], squares[5]],
-      [squares[6], squares[7], squares[8]],
-      [squares[0], squares[3], squares[6]],
-      [squares[1], squares[4], squares[7]],
-      [squares[2], squares[5], squares[8]],
-      [squares[0], squares[4], squares[8]],
-      [squares[2], squares[4], squares[6]] ]
+  def horizontal_win
+    binding.pry
+    squares.any? {|row| row[0].occupied && row[0].occupied == row[1].occupied && row[1].occupied == row[2].occupied}
+  end
+
+  # make row num flexible too?
+  def vertical_win
+    index = 0
+    win = false
+    while index < squares.first.length
+      win = true if squares[0][index].occupied &&
+                    squares[0][index].occupied == squares[1][index].occupied &&
+                    squares[1][index].occupied == squares[2][index].occupied
+      index += 1
+    end
+    win
+  end
+
+  def diagonal_win
+    win = false
+    first_index = 0
+    last_index = squares.first.length - 1
+    if squares[0][first_index].occupied
+      win = true if squares[0][first_index].occupied == squares[1][first_index + 1] &&
+                    squares[1][first_index + 1].occupied == squares[2][first_index + 2]
+    elsif squares[0][last_index].occupied
+      win = true if squares[0][last_index].occupied == squares[1][last_index - 1] &&
+                    squares[1][last_index - 1].occupied == squares[2][last_index - 2]
+    end
+    win
   end
 
   def populate_board
-    (0..8).each do |num|
-      squares << Square.new(num)
+    (0..2).each do |time|
+      squares << populate_row(time)
     end
   end
 
-  def populate_row
-    
+  def populate_row(i)
+    row = []
+    (0..2).each do |num|
+      row << Square.new(num + i * 3)
+    end
+    row
   end
 
   def game_is_over
-    squares.all? { |square| square.occupied }
+    squares.all? { |row| row.all? {|square| square.occupied } }
   end
 
   def game_is_won
-    winning.find do |combo|
-      combo[0].occupied && combo[0].occupied == combo[1].occupied && combo[1].occupied == combo[2].occupied
-    end
-    # [b[0], b[1], b[2]].uniq.length == 1 ||
-    # [b[3], b[4], b[5]].uniq.length == 1 ||
-    # [b[6], b[7], b[8]].uniq.length == 1 ||
-    # [b[0], b[3], b[6]].uniq.length == 1 ||
-    # [b[1], b[4], b[7]].uniq.length == 1 ||
-    # [b[2], b[5], b[8]].uniq.length == 1 ||
-    # [b[0], b[4], b[8]].uniq.length == 1 ||
-    # [b[2], b[4], b[6]].uniq.length == 1
+    horizontal_win || vertical_win || diagonal_win
   end
 
   def tie
@@ -51,7 +66,7 @@ class Board
   end
 
   def make_copy
-    copy_of_squares = self.squares.map {|square| square.dup}
+    copy_of_squares = self.squares.map {|row| row.map {|square| square.dup}}
     Board.new(copy_of_squares, self.turn_num)
   end
 

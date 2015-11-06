@@ -74,29 +74,33 @@ class Game
   end
 
   def render_board
-    """
-      #{render_square(0)}|#{render_square(1)}|#{render_square(2)}
-      #{render_square(3)}|#{render_square(4)}|#{render_square(5)}
-      #{render_square(6)}|#{render_square(7)}|#{render_square(8)}
-    """
+    puts board.squares.each do |row|
+      """ #{render_square(row, 0)}|#{render_square(row, 1)}|#{render_square(row, 2)}"""
+    end
+    # """
+    #   #{render_square(0)}|#{render_square(1)}|#{render_square(2)}
+    #   #{render_square(3)}|#{render_square(4)}|#{render_square(5)}
+    #   #{render_square(6)}|#{render_square(7)}|#{render_square(8)}
+    # """
   end
 
-  def render_square(i)
-    board.squares[i].occupied ? board.squares[i].occupied : board.squares[i].number
+  def render_square(row, i)
+    board.squares[row][i].occupied ? board.squares[row][i].occupied : board.squares[row][i].number
   end
+
 
   def start_game
     welcome
-    puts render_board
+    render_board
     pick_players
-    puts render_board
+    render_board
     play until board.game_is_won || board.game_is_over
     end_message
   end
 
   def play
     board.turn_num.even? ? player1.move : player2.move
-    puts render_board
+    render_board
   end
 
   def end_message

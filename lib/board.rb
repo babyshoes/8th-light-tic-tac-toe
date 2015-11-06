@@ -24,10 +24,6 @@ class Board
     end
   end
 
-  def populate_row
-    
-  end
-
   def game_is_over
     squares.all? { |square| square.occupied }
   end

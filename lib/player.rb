@@ -2,7 +2,7 @@ require_relative 'AI.rb'
 class Player
   include AI
   attr_reader :type, :name
-  attr_accessor :icon, :status, :board, :choice
+  attr_accessor :icon, :status, :board, :choice, :scores, :moves
 
   HUMAN = 0
   COMPUTER = 1
@@ -17,6 +17,8 @@ class Player
     @board = board
     @type = type
     @status = 'playing'
+    @scores = []
+    @moves = []
     @@all << self
   end
 
@@ -25,13 +27,13 @@ class Player
   end
 
   def human_move
-    puts "What's your move? [0-9]"
+    puts "What's your move? [0-8]"
     pick_square
   end
 
   def pick_square
     id = gets.chomp.to_i
-    (0..9).include? id && board.squares[id].occupied ? human_move : occupy_square(id)
+    (0..8).include? id && board.squares[id].occupied ? human_move : occupy_square(id)
   end
 
   def occupy_square(id, player = self, board_state = board)
@@ -68,31 +70,38 @@ class Player
     end
   end
 
-  def minimax(board, depth = 0)
-    return score(board, depth) if board.game_is_over || board.game_is_won
+  def minimax(board_state, depth = 0)
+    return score(board_state, depth) if board_state.game_is_over || board_state.game_is_won
     depth += 1
-    scores = []
-    moves = []
-    board_state = board.make_copy
+    # scores = []
+    # moves = []
+    board_state = board_state.make_copy
+    # binding.pry
     board_state.available_spaces.each do |possible_move|
+      binding.pry
       player = depth.even? ? self.opponent : self
       occupy_square(possible_move.number, player, board_state)
       scores.push minimax(board_state, depth)
       moves.push possible_move
+      binding.pry
     end
+    binding.pry
     if (board_state.turn_num + @@all.index(self)).even?
       max_index = scores.each_with_index.max[1]
       @choice = moves[max_index]
+      # binding.pry
       return scores[max_index]
     else
       min_index = scores.each_with_index.min[1]
       @choice = moves[min_index]
+      # binding.pry
       return scores[min_index]
     end
   end
 
   def get_best_move
     minimax(board)
+    binding.pry
   end
 
   # def get_best_move(next_player, depth = 0, best_score = {})

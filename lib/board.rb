@@ -71,7 +71,7 @@ class Board
   end
 
   def available_spaces
-    squares.select { |square| !square.occupied }
+    squares.flatten.select { |square| !square.occupied }
   end
 
   def available_corners

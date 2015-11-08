@@ -74,19 +74,34 @@ describe 'Board' do
         end
 
     context 'board knows its unoccupied squares'
-      describe 'available_corners'
+      describe '#available_corners'
         it 'returns an empty array when there are no available corners' do
           expect(full_board.available_corners.any?).to eq(false)
         end
         it 'returns square numbers of available corners' do
           expect(horizontal_win_board.available_corners).to eq([6, 8])
         end
-      describe 'available_spaces'
+      describe '#available_spaces'
         it 'returns an empty array when there are no available spaces' do
           expect(full_board.available_spaces.any?).to eq(false)
         end
         it 'returns square numbers of available spaces' do
           expect(horizontal_win_board.available_spaces).to eq([3, 6, 8])
         end
+
+    describe '#get_position'
+        it 'can find a square position by its id' do
+          expect(board.get_position(6)).to eq([2, 0])
+          expect(larger_board.get_position(6)).to eq([1, 0])
+        end
+
+    describe '#make_copy'
+      let(:board_copy) {board.make_copy}
+      it 'makes a copy of the board that can be manipulated without changing the original board' do
+        expect(board_copy).to_not eq(board)
+        expect(board_copy.squares).to eq(board.squares)
+        board_copy.squares[0][0] = 'X'
+        expect(board_copy.squares).not_to eq(board)
+      end
 
 end

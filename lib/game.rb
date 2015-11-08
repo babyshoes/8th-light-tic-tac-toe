@@ -2,7 +2,7 @@
 class Game
   attr_accessor :board, :players, :player1, :player2, :winner
   def initialize
-    @board = Board.new(5)
+    @board = Board.new
     # @players = [@player1, @player2]
   end
 
@@ -73,6 +73,7 @@ class Game
     end
   end
 
+  #TODO: make render pretty when board #s are double digits
   def render_board
     i = 0
     while i < board.dimension

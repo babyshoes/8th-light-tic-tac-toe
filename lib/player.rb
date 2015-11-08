@@ -27,18 +27,18 @@ class Player
   end
 
   def human_move
-    puts "What's your move? Select square number."
+    puts "What's your move? Select available square number."
     pick_square
   end
 
   def pick_square
     id = gets.chomp.to_i
-    board.squares.flatten.include? id
-    # (0..8).include? id && board.squares[id].occupied ? human_move : occupy_square(id)
+    board.squares.flatten.include? id ? occupy_square(id) : human_move
   end
 
   def occupy_square(id, player = self, board_state = board)
-    board_state.squares[id].occupied = player.icon
+    coords = board_state.get_position(id)
+    board_state.squares[coords.first][coords.last] = player.icon
     board_state.turn_num += 1
   end
 

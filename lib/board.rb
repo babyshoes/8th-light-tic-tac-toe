@@ -7,7 +7,8 @@ class Board
     @dimension = dimension
     @squares = squares
     @turn_num = turn_num
-    populate_board if squares.empty?
+    @dimension = dimension
+    populate_board if squares.all? {|row| row.empty?}
   end
 
   def populate_board
@@ -67,11 +68,6 @@ class Board
     game_is_over && !game_is_won
   end
 
-  def make_copy
-    copy_of_squares = squares.map {|row| row.map {|square| square.dup}}
-    Board.new(board.copy_of_squares, board.turn_num)
-  end
-
   def available?(set)
     set.select { |square| square.is_a? Integer }
   end
@@ -83,5 +79,16 @@ class Board
   def available_corners
     corners = [squares[0][0], squares[0][dimension - 1], squares[dimension - 1][0], squares[dimension - 1][dimension - 1]]
     available?(corners)
+  end
+
+  def get_position(id)
+    x = id / dimension
+    y = id % dimension
+    [x, y]
+  end
+
+  def make_copy
+    copy_of_squares = squares.map {|row| row.dup }
+    Board.new(dimension, copy_of_squares, turn_num)
   end
 end

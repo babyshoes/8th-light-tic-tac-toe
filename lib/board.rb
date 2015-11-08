@@ -26,7 +26,7 @@ class Board
   end
 
   def horizontal_win
-    squares.find do |row|
+    row = squares.find do |row|
       row.uniq.length == 1
     end
   end
@@ -61,7 +61,11 @@ class Board
   end
 
   def game_is_won
-    !!diagonal_win || !!vertical_win || !!horizontal_win
+    win = !!diagonal_win || !!vertical_win || !!horizontal_win
+    if win
+      @winner = turn_num.even? ? Player.all.last : Player.all.first
+    end
+    win
   end
 
   def tie

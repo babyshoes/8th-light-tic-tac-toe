@@ -1,6 +1,6 @@
 #view
 class Game
-  attr_accessor :board, :players, :player1, :player2, :winner
+  attr_accessor :board, :player1, :player2
   def initialize
     @board = Board.new
     # @players = [@player1, @player2]
@@ -63,11 +63,11 @@ class Game
   def pick_representation
     choice = gets.chomp
     if representations.include? choice.downcase
-      @player1.icon = choice.downcase
-      @player2.icon = representations.index(choice) == 0 ? representations[1] : representations[0]
+      player1.icon = choice.downcase
+      player2.icon = representations.index(choice) == 0 ? representations[1] : representations[0]
     elsif choice == "0" || choice == "1"
-      @player1.icon = representations[choice.to_i]
-      @player2.icon = choice.to_i == 0 ? representations[1] : representations[0]
+      player1.icon = representations[choice.to_i]
+      player2.icon = choice.to_i == 0 ? representations[1] : representations[0]
     else
       representation_choices
     end
@@ -97,18 +97,13 @@ class Game
 
   def render_row(index)
     row = board.squares[index]
-    row = row.map do |square|
+    row = row.map.each_with_index do |square, i|
       square_str = "#{square}"
-      square_str << " | " unless row.index(square) == row.length - 1
+      square_str << " | " unless i == row.length - 1
       square_str
     end
     row.join
   end
-
-  def render_square(i)
-    board.squares[i].occupied ? board.squares[i].occupied : board.squares[i].number
-  end
-
 
   def start_game
     welcome
@@ -128,7 +123,6 @@ class Game
     if board.tie
       puts "Tied game!"
     else
-      board.winner = board.turn_num.even? ? player2 : player1
       puts "#{board.winner.name} wins!"
     end
     play_again?

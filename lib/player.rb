@@ -22,6 +22,14 @@ class Player
     @@all << self
   end
 
+  def self.all
+    @@all
+  end
+
+  def self.find_player(icon)
+    @@all.find{|player| player.icon == icon}
+  end
+
   def move
     type == HUMAN ? human_move : comp_move
   end
@@ -57,14 +65,14 @@ class Player
     #   spot = board.available_corners.sample
     # else
       get_best_move
-      spot = choice.number
+      spot = choice
     # end
     occupy_square(spot)
     puts "#{name} took spot #{spot}."
   end
 
   def score(board, depth)
-    if !board.tie
+    if board.game_is_won
       return board.winner == self ? 100 - depth : depth - 100
     else
       return 0
@@ -72,22 +80,22 @@ class Player
   end
 
   def minimax(board_state, depth = 0)
-    return score(board_state, depth) if board_state.game_is_over || board_state.game_is_won
-    depth += 1
-    # scores = []
-    # moves = []
-    board_state = board_state.make_copy
     # binding.pry
-    board_state.available_spaces(squares).each do |possible_move|
-      binding.pry
-      player = depth.even? ? self.opponent : self
-      occupy_square(possible_move.number, player, board_state)
-      scores.push minimax(board_state, depth)
+    return score(board_state, depth) if board_state.game_is_over || board_state.game_is_won
+    scores = []
+    moves = []
+    # binding.pry
+    board_state.available_spaces.each do |possible_move|
+      board_state = board_state.make_copy
+      # binding.pry
+      player = depth.even? ? self : self.opponent
+      occupy_square(possible_move, player, board_state)
+        scores.push minimax(board_state, depth + 1)
       moves.push possible_move
-      binding.pry
+      # binding.pry
     end
-    binding.pry
-    if (board_state.turn_num + @@all.index(self)).even?
+    # binding.pry
+    if (board_state.turn_num + @@all.index(self)).odd?
       max_index = scores.each_with_index.max[1]
       @choice = moves[max_index]
       # binding.pry
@@ -100,9 +108,18 @@ class Player
     end
   end
 
+  # def minimax(board_state, depth = 0)
+  #   return score(board_state, depth) if board_state.game_is_won || board_state.game_is_over
+  #   move_nodes = []
+  #   board_state.available_spaces.each do |possible_move|
+  #     board_state = board_state.make_copy
+  #     player = depth.even? ? self.opponent : self
+  #     occupy_square(possible_move, player, board_state)
+  #     score = minimax(board_state, depth + 1, )
+  # end
+
   def get_best_move
     minimax(board)
-    binding.pry
   end
 
   # def get_best_move(next_player, depth = 0, best_score = {})

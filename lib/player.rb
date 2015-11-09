@@ -71,8 +71,7 @@ class Player
     when EZ_COMPUTER
       get_random_move
     when MEDIUM_COMPUTER
-      ok_move = get_ok_move
-      ok_move ? ok_move.sample : get_random_move
+      get_ok_move
     when PERFECT_COMPUTER
       get_best_move
     end

@@ -5,7 +5,7 @@ module AI
     @scored_moves ||= {}
   end
 
-  def get_ok_move
+  def dire_conditions_move
   win_immediately = []
   block_win = []
   board.available_spaces.each do |possible_move|
@@ -19,8 +19,12 @@ module AI
       end
     end
   end
-  binding.pry
-    win_immediately.any? ? win_immediately.sample : block_win.sample
+    @choice = win_immediately.any? ? win_immediately.sample : block_win.sample
+  end
+
+  def get_ok_move
+    dire_conditions_move
+    get_random_move if !choice
   end
 
   def get_random_move

@@ -25,7 +25,7 @@ describe 'Player' do
 
   context 'if type is human'
     describe '#move' do
-
+      
     end
 
 end

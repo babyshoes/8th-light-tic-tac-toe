@@ -28,7 +28,7 @@ describe 'Board' do
     }
     let(:missing){
       m = Board.new
-      m.squares = [[0, "O", "O"], ["O", "O", "O"], ["O", "O", "O"]]
+      m.squares = [[0, "O", "O"], ["X", "O", "X"], ["X", "X", "O"]]
       m
     }
     let(:diagonal_win_board) {
@@ -52,7 +52,7 @@ describe 'Board' do
         it 'returns true when all spaces are occupied' do
           expect(full_board.game_is_over).to eq(true)
         end
-        it 'returns false if even one square can be occupied' do
+        it 'returns false if nobody has won and even one square can be occupied' do
           expect(missing.game_is_over).to eq(false)
         end
 

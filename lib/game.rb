@@ -34,7 +34,7 @@ class Game
         puts "Sorry I didn't catch that."
         pick_type
       end
-    elsif choice == "0" || choice == "1"
+    elsif choice == "0" || choice == "1" || choice == "2" || choice == "3"
       return choice.to_i
     else
       puts "Sorry I didn't catch that."
@@ -43,8 +43,16 @@ class Game
   end
 
   def player_types
-    ["man", "machine"]
+    ["man", "ez machine", "medium machine", "perfect machine"]
   end
+
+  # def pick_difficulty_level
+  #
+  # end
+  #
+  # def display_difficulty_levels
+  #
+  # end
 
   def display_types
     player_types.each_with_index {|type, i| p "#{i}. #{type}"}
@@ -110,7 +118,7 @@ class Game
     puts render_board
     pick_players
     puts render_board
-    play until board.game_is_won || board.game_is_over
+    play until board.game_is_over
     end_message
   end
 
@@ -120,10 +128,10 @@ class Game
   end
 
   def end_message
-    if board.tie
-      puts "Tied game!"
+    if board.winner
+      puts "#{Player.find_by(board.winner).name} wins!"
     else
-      puts "#{board.winner.name} wins!"
+      puts "Tied game!"
     end
     play_again?
   end

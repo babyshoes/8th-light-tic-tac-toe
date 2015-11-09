@@ -29,13 +29,15 @@ class Board
     row = squares.find do |row|
       row.uniq.length == 1
     end
+    @winner = row.first if row
   end
 
   def vertical_win
     squares.first.each_with_index.find do |square, y|
       squares_to_compare = []
       dimension.times {|x| squares_to_compare << squares[x][y]}
-      squares_to_compare.uniq.length == 1
+      win = squares_to_compare.uniq.length == 1
+      @winner = squares_to_compare.first if win
     end
   end
 
@@ -47,29 +49,32 @@ class Board
   def diagonal_win_right
     squares_to_compare = []
     dimension.times {|x| squares_to_compare << squares[x][x]}
-    squares_to_compare.uniq.length == 1
+    win = squares_to_compare.uniq.length == 1
+    @winner = squares_to_compare.first if win
   end
 
   def diagonal_win_left
     squares_to_compare = []
     dimension.times {|x| squares_to_compare << squares[x][dimension - x - 1]}
-    squares_to_compare.uniq.length == 1
+    win = squares_to_compare.uniq.length == 1
+    @winner = squares_to_compare.first if win
   end
 
   def game_is_over
-    squares.all? { |row| row.all? {|square| square.is_a? String } }
+    game_is_won || tie
   end
 
   def game_is_won
-    win = !!diagonal_win || !!vertical_win || !!horizontal_win
-    if win
-      @winner = turn_num.even? ? Player.all.last : Player.all.first
-    end
-    win
+    !!diagonal_win || !!vertical_win || !!horizontal_win
+    # if win
+    #   binding.pry
+    #   @winner = turn_num.even? ? Player.all.last.icon : Player.all.first.icon
+    # end
+    # win
   end
 
   def tie
-    game_is_over && !game_is_won
+    squares.all? { |row| row.all? {|square| square.is_a? String } } && !game_is_won
   end
 
   def available?(set)

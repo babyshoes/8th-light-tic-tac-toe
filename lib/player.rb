@@ -2,11 +2,12 @@ require_relative 'AI.rb'
 class Player
   include AI
   attr_reader :type, :name
-  attr_accessor :icon, :status, :board, :choice, :scores, :moves
+  attr_accessor :icon, :status, :board, :scores, :moves
 
   HUMAN = 0
-  COMPUTER = 1
-  #EZCOMP = 1, MEDCOMP = 2, HARDCOMP = 3
+  EZ_COMPUTER = 1
+  MEDIUM_COMPUTER = 2
+  PERFECT_COMPUTER = 3
 
   # should playeres own squares????
 
@@ -17,8 +18,6 @@ class Player
     @board = board
     @type = type
     @status = 'playing'
-    @scores = []
-    @moves = []
     @@all << self
   end
 
@@ -26,7 +25,7 @@ class Player
     @@all
   end
 
-  def self.find_player(icon)
+  def self.find_by(icon)
     @@all.find{|player| player.icon == icon}
   end
 
@@ -45,13 +44,11 @@ class Player
   end
 
   def occupy_square(id, player = self, board_state = board)
-    coords = board_state.get_position(id)
-    board_state.squares[coords.first][coords.last] = player.icon
-    board_state.turn_num += 1
-  end
-
-  def comp_move
-    eval_board
+    unless board_state.game_is_over
+      coords = board_state.get_position(id)
+      board_state.squares[coords.first][coords.last] = player.icon
+      board_state.turn_num += 1
+    end
   end
 
   def opponent
@@ -67,59 +64,20 @@ class Player
       get_best_move
       spot = choice
     # end
-    occupy_square(spot)
-    puts "#{name} took spot #{spot}."
   end
 
-  def score(board, depth)
-    if board.game_is_won
-      return board.winner == self ? 100 - depth : depth - 100
-    else
-      return 0
+  def comp_move
+    case type
+    when EZ_COMPUTER
+      get_random_move
+    when MEDIUM_COMPUTER
+      ok_move = get_ok_move
+      ok_move ? ok_move.sample : get_random_move
+    when PERFECT_COMPUTER
+      get_best_move
     end
-  end
-
-  def minimax(board_state, depth = 0)
-    # binding.pry
-    return score(board_state, depth) if board_state.game_is_over || board_state.game_is_won
-    scores = []
-    moves = []
-    # binding.pry
-    board_state.available_spaces.each do |possible_move|
-      board_state = board_state.make_copy
-      # binding.pry
-      player = depth.even? ? self : self.opponent
-      occupy_square(possible_move, player, board_state)
-        scores.push minimax(board_state, depth + 1)
-      moves.push possible_move
-      # binding.pry
-    end
-    # binding.pry
-    if (board_state.turn_num + @@all.index(self)).odd?
-      max_index = scores.each_with_index.max[1]
-      @choice = moves[max_index]
-      # binding.pry
-      return scores[max_index]
-    else
-      min_index = scores.each_with_index.min[1]
-      @choice = moves[min_index]
-      # binding.pry
-      return scores[min_index]
-    end
-  end
-
-  # def minimax(board_state, depth = 0)
-  #   return score(board_state, depth) if board_state.game_is_won || board_state.game_is_over
-  #   move_nodes = []
-  #   board_state.available_spaces.each do |possible_move|
-  #     board_state = board_state.make_copy
-  #     player = depth.even? ? self.opponent : self
-  #     occupy_square(possible_move, player, board_state)
-  #     score = minimax(board_state, depth + 1, )
-  # end
-
-  def get_best_move
-    minimax(board)
+    occupy_square(choice)
+    puts "#{name} took spot #{choice}."
   end
 
   # def get_best_move(next_player, depth = 0, best_score = {})
@@ -149,10 +107,6 @@ class Player
   #   end
   # end
 
-  # def get_ok_move
-  #if any of the winning combos has all 3 of the same thing, then inspect if
-  #comp can win
-  #then, if comp can block a win
-  # end
+
 
 end

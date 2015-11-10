@@ -66,11 +66,6 @@ class Board
 
   def game_is_won
     !!diagonal_win || !!vertical_win || !!horizontal_win
-    # if win
-    #   binding.pry
-    #   @winner = turn_num.even? ? Player.all.last.icon : Player.all.first.icon
-    # end
-    # win
   end
 
   def tie

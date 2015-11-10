@@ -74,7 +74,7 @@ class Board
   end
 
   def tie
-    squares.all? { |row| row.all? {|square| square.is_a? String } } && !game_is_won
+    available_spaces.empty?
   end
 
   def available?(set)

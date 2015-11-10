@@ -9,8 +9,6 @@ class Player
   MEDIUM_COMPUTER = 2
   PERFECT_COMPUTER = 3
 
-  # should playeres own squares????
-
   @@all = []
 
   def initialize(name, board, type)

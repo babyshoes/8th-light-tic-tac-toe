@@ -1,9 +1,11 @@
 module AI
-  attr_accessor :choice, :scored_moves
+  attr_accessor :piece
+  attr_accessor :choice
 
-  def scored_moves
-    @scored_moves ||= {}
+  def stuff
+    @stuff ||= []
   end
+
 
   def dire_conditions_move
   win_immediately = []
@@ -33,30 +35,40 @@ module AI
 
   def score(board, depth)
     if board.game_is_won
-      return board.winner == self.icon ? 100 - depth : depth - 100
+      binding.pry
+      return board.winner == piece ? 100 - depth : depth - 100
+      # return board.winner == self.icon ? 100 : -100
     else
+      # binding.pry
       return 0
     end
   end
 
-  def minimax(board_state, player, depth = 0, scored_moves = {})
-    return score(board_state, depth) if board_state.game_is_over
-    board_state.available_spaces.each do |possible_move|
-      board_state = board_state.make_copy
+  def minimax(board, player, depth = 0, scored_moves = {})
+    return score(board, depth) if board.game_is_over
+    depth += 1
+    board.available_spaces.each do |possible_move|
+      board_state = board.make_copy
       occupy_square(possible_move, player, board_state)
-      scored_moves[possible_move] = minimax(board_state, player.opponent, depth += 1, scored_moves)
+      # binding.pry
+      scored_moves[possible_move] = minimax(board_state, player.opponent, depth)
     end
-    @choice, best_score = best_move(board_state, player, scored_moves)
+    @choice, best_score = best_move(board, player, scored_moves)
     best_score
   end
 
   def get_best_move
+    stuff
+    @piece = self.icon
     minimax(board, self)
     binding.pry
   end
 
-  def best_move(board_state, player, scored_moves)
-    if (board_state.turn_num + Player.all.index(player)).even?
+  def best_move(board, player, scored_moves)
+    # binding.pry
+    stuff << scored_moves
+    # if (board.turn_num + Player.all.index(player)).even?
+    if piece == player.icon
       scored_moves.max_by { |k,v| v }
     else
       scored_moves.min_by { |k,v| v }

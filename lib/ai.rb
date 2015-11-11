@@ -65,7 +65,6 @@ module AI
   end
 
   def best_move(board, player, scored_moves)
-    # binding.pry
     stuff << scored_moves
     # if (board.turn_num + Player.all.index(player)).even?
     if piece == player.icon

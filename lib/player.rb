@@ -2,7 +2,7 @@ require_relative 'AI.rb'
 class Player
   include AI
   attr_reader :type, :name
-  attr_accessor :icon, :status, :board, :scores, :moves
+  attr_accessor :icon, :status, :board
 
   HUMAN = 0
   EZ_COMPUTER = 1
@@ -11,11 +11,12 @@ class Player
 
   @@all = []
 
-  def initialize(name, board, type)
-    @name = name
+  def initialize(board, player_hash = {})
     @board = board
-    @type = type
-    @status = 'playing'
+    @name = player_hash[:name]
+    @type = player_hash[:type]
+    @icon = player_hash[:icon]
+    @status = player_hash[:status]
     @@all << self
   end
 
@@ -25,6 +26,10 @@ class Player
 
   def self.find_by(icon)
     @@all.find{|player| player.icon == icon}
+  end
+
+  def change_status
+    status == 'active' ? 'waiting' : 'active'
   end
 
   def move
@@ -46,6 +51,7 @@ class Player
       coords = board_state.get_position(id)
       board_state.squares[coords.first][coords.last] = player.icon
       board_state.turn_num += 1
+      Player.all.inject(:change_status)
     end
   end
 

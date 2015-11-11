@@ -1,5 +1,5 @@
 class Game
-  attr_accessor :board, :player1, :player2
+  attr_accessor :board
   def initialize
     @board = Board.new
   end

@@ -45,14 +45,14 @@ describe 'Player' do
     end
 
   context 'if type is medium-difficulty AI'
-    describe '#move'
+    describe '#medium_move'
       it 'will prioritize winning if given the immediate option' do
 
       end
       it 'will block the other player from winning' do
 
       end
-      it 'otherwise plays like the easy-difficulty AI' do
+      it 'otherwise picks move randomly' do
 
       end
 

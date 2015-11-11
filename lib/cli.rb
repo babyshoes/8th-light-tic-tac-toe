@@ -1,11 +1,17 @@
+require_relative 'input.rb'
+
 class CLI
+  include Input
   attr_reader :players
   attr_accessor :game, :score, :player1, :player2
 
+  ACTIVE = 0
+  WAITING = 1
+
   def initialize
     @score = {}
-    @player1 = {name: "Player 1", type: player_types[0], icon: representations[0], status: 'active'}
-    @player2 = {name: "Player 2", type: player_types[2], icon: representations[1], status: 'waiting'}
+    @player1 = {name: "Player 1", type: 0, icon: representations[0], status: ACTIVE}
+    @player2 = {name: "Player 2", type: 3, icon: representations[1], status: WAITING}
     @players = [@player1, @player2]
   end
 
@@ -14,25 +20,24 @@ class CLI
     @game = Game.new
     puts game.render_board
     instructions
-    pick_players
-    start_over?
+    if !skip_setup?
+      pick_players
+      start_over?
+    end
+    create_players
     start_game
   end
 
-  def catch_user_error
-    puts "Sorry I didn't catch that."
-    yield
-  end
-
-  def get_input
-    input = gets.chomp
-    if input.downcase == 'h' || input.downcase == 'x' || input.downcase == 'i'
-      help if input.downcase == 'h'
-      goodbye if input.downcase == 'x'
-      instructions if input.downcase == 'i'
-      get_input
+  def skip_setup?
+    puts "Skip user set up, go directly to game? [y/n]"
+    input = get_input
+    if input.downcase == 'y'
+      return true
+    elsif input.downcase == 'n'
+      return false
+    else
+      catch_user_error {skip_setup?}
     end
-    input
   end
 
   def welcome
@@ -43,17 +48,7 @@ class CLI
     ["Welcome to Tic Tac Toe", "Howdy! Let's play.", "Ready to rumble?"]
   end
 
-  def help
-    puts "Enter 'h' at any time for help."
-    puts "Enter 'x' at any time to quit."
-    puts "Enter 'i' at any time for instructions."
-  end
 
-  def instructions
-    dimension = game ? game.board.dimension : "a certain number of pieces"
-    puts "Get #{dimension} in a row horizontally, vertically, or diagonally. Tic tac toe, defeat your foe."
-    help
-  end
 
   def representations
     ["x", "o"]
@@ -61,14 +56,12 @@ class CLI
 
   def pick_players
     inquiry(player1)
-    Player.new(game.board, player1)
     inquiry(player2)
+  end
+
+  def create_players
+    Player.new(game.board, player1)
     Player.new(game.board, player2)
-    # puts "First player is:"
-    # board.player1 = Player.new("Player 1", board, pick_type, 'active')
-    # puts "Second player is:"
-    # board.player2 = Player.new("Player 2", board, pick_type, 'waiting')
-    # representation_choices
   end
 
   def inquiry(player)
@@ -91,14 +84,17 @@ class CLI
   end
 
   def pick_type(player)
-    puts "Is #{player[:name]} a #{player[:type]}? [y/n]"
+    puts "Is #{player[:name]} a #{player_types[player[:type]]}? [y/n]"
     input = get_input
     if input.downcase == 'n'
       puts "Ok, #{player[:name]} is: [select number]"
       display_types
-      type = get_input
-      # if type == representations
-      player[:type] = type
+      input = get_input
+      if ["0", "1", "2", "3"].include? input
+        player[:type] = input.to_i
+      else
+        catch_user_error {pick_type(player)}
+      end
     end
   end
 
@@ -130,7 +126,7 @@ class CLI
     representations.each_with_index {|icon, i| puts "#{i + 1}. #{icon}"}
     input = get_input.to_i
     if input < 1 || input > 2
-      catch_user_error {pick_icon}
+      catch_user_error {pick_icon(player)}
     else
       player[:icon] = input == 1 ? representations[0] : representations[1]
       @player2[:icon] = player1[:icon] == representations[0] ? representations[1] : representations[1]
@@ -141,9 +137,9 @@ class CLI
     puts "#{player[:name]} goes first or second? [1/2]"
     input = get_input.to_i
     if input < 1 || input > 2
-      catch_user_error {pick_status}
+      catch_user_error {pick_status(player)}
     else
-      player[:status] = input == 1 ? 'active' : 'waiting'
+      player[:status] = input == 1 ? ACTIVE : WAITING
     end
   end
 
@@ -168,7 +164,7 @@ class CLI
 
   def start_game
     puts game.render_board
-    game.play until game.board.game_is_over
+    play until game.board.game_is_over
     end_message
   end
 
@@ -197,7 +193,7 @@ class CLI
   #
   #
   def player_types
-    ["human", "machine", "slightly smarter machine", "overlord machine"]
+    ["human", "machine", "slightly smarter machine", "machine overlord"]
   end
   #
 
@@ -216,77 +212,83 @@ class CLI
   #
   #
 
-  #
-  # def play_again?
-  #   puts "Play again? [y/n]"
-  #   input = gets.chomp.downcase
-  #   case input
-  #   when 'y'
-  #     play_again
-  #   when 'n'
-  #     puts goodbye.sample
-  #   else
-  #     catch_user_error {play_again?}
-  #   end
-  # end
-  #
-  # def goodbye
-  #   ["Goodbye.", "Adieu.", "Aloha.", "( >'.')> <('.'< )"]
-  # end
-  #
-  # def play_again
-  #   Player.all.clear
-  #   @game = Game.new()
-  #   same_players?
-  #   start_game
-  # end
-  #
-  # def same_players?
-  #   puts "Same players? [y/n]"
-  #   input = gets.chomp.downcase
-  #   case input
-  #   when 'y'
-  #
-  #   when 'n'
-  #     pick_players
-  #   else
-  #     catch_user_error {same_players?}
-  #   end
-  # end
-  #
+
+  def play_again?
+    puts "Play again? [y/n]"
+    input = gets.chomp.downcase
+    case input
+    when 'y'
+      play_again
+    when 'n'
+      goodbye
+    else
+      catch_user_error {play_again?}
+    end
+  end
+
+  def play_again
+    Player.all.clear
+    @game = Game.new
+    same_players?
+    start_game
+  end
+
+  def same_players?
+    puts "Same players? [y/n]"
+    input = get_input
+    if input.downcase == 'y'
+      create_players
+    elsif input.downcase == 'n'
+      pick_players
+    else
+      catch_user_error {same_players?}
+    end
+  end
+
   def play
     get_active_player.move
-    # board.turn_num.even? ? player1.move : player2.move
-    # put active switcher and turn counter here?
+    switch_active_player
     puts game.render_board
   end
-  #
-  # def get_active_player
-  #   Player.all.find {|player| player.status == 'active'}
-  # end
-  #
-  # def end_message
-  #   if win_icon = game.board.winner
-  #     winner = Player.find_by(win_icon)
-  #     score["#{winner.name}"] ||= {'wins' => 0, 'losses' => 0}
-  #     score["#{winner.opponent.name}"] ||= {'wins' => 0, 'losses' => 0}
-  #     score["#{winner.name}"]['wins'] += 1
-  #     score["#{winner.opponent.name}"][:losses] += 1
-  #     puts "#{winner.name} wins!"
-  #   else
-  #     puts "Tied game!"
-  #   end
-  #   tally_wins
-  #   play_again?
-  # end
-  #
-  # def tally_wins
-  #   if score.any?
-  #     score.each { |name, games| puts "#{name} has won #{games['wins']} games." }
-  #   else
-  #     puts "Get conquering! No one has won yet."
-  #   end
-  # end
+
+  def get_active_player
+    Player.all.find {|player| player.status == 0}
+  end
+
+  def switch_active_player
+    Player.all.each {|player| player.change_status}
+  end
+
+  def end_message
+    if win_icon = game.board.winner
+      display(update_score(win_icon))
+    else
+      puts "Tied game!"
+    end
+    tally_wins
+    play_again?
+  end
+
+  def update_score(win_icon)
+    winner = Player.find_by(win_icon)
+    score["#{winner.name}"] ||= {'wins' => 0, 'losses' => 0}
+    score["#{winner.opponent.name}"] ||= {'wins' => 0, 'losses' => 0}
+    score["#{winner.name}"]['wins'] += 1
+    score["#{winner.opponent.name}"]['losses'] += 1
+    winner
+  end
+
+  def display(winner)
+    puts "#{winner.name} wins!"
+  end
+
+  def tally_wins
+    if score.any?
+      score.each { |name, games| puts "#{name} has won #{games['wins']} games." }
+    else
+      puts "No one has won any games yet. Get conquering! "
+    end
+  end
 
 
 end

@@ -2,11 +2,6 @@ module AI
   attr_accessor :piece
   attr_accessor :choice
 
-  def stuff
-    @stuff ||= []
-  end
-
-
   def dire_conditions_move
   win_immediately = []
   block_win = []
@@ -35,11 +30,8 @@ module AI
 
   def score(board, depth)
     if board.game_is_won
-      binding.pry
       return board.winner == piece ? 100 - depth : depth - 100
-      # return board.winner == self.icon ? 100 : -100
     else
-      # binding.pry
       return 0
     end
   end
@@ -50,7 +42,6 @@ module AI
     board.available_spaces.each do |possible_move|
       board_state = board.make_copy
       occupy_square(possible_move, player, board_state)
-      # binding.pry
       scored_moves[possible_move] = minimax(board_state, player.opponent, depth)
     end
     @choice, best_score = best_move(board, player, scored_moves)
@@ -58,15 +49,11 @@ module AI
   end
 
   def get_best_move
-    stuff
     @piece = self.icon
     minimax(board, self)
-    binding.pry
   end
 
   def best_move(board, player, scored_moves)
-    stuff << scored_moves
-    # if (board.turn_num + Player.all.index(player)).even?
     if piece == player.icon
       scored_moves.max_by { |k,v| v }
     else

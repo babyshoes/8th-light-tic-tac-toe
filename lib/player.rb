@@ -1,6 +1,9 @@
 require_relative 'AI.rb'
+require_relative 'input.rb'
+
 class Player
   include AI
+  include Input
   attr_reader :type, :name
   attr_accessor :icon, :status, :board
 
@@ -8,6 +11,8 @@ class Player
   EZ_COMPUTER = 1
   MEDIUM_COMPUTER = 2
   PERFECT_COMPUTER = 3
+  ACTIVE = 0
+  WAITING = 1
 
   @@all = []
 
@@ -29,7 +34,11 @@ class Player
   end
 
   def change_status
-    status == 'active' ? 'waiting' : 'active'
+    @status = @status == ACTIVE ? WAITING : ACTIVE
+  end
+
+  def opponent
+    @@all.index(self) == 0 ? @@all[1] : @@all[0]
   end
 
   def move
@@ -42,8 +51,10 @@ class Player
   end
 
   def pick_square
-    id = gets.chomp.to_i
-    board.squares.flatten.include? id ? occupy_square(id) : human_move
+    id = get_input
+    id_num = id.to_i
+    human_move if id_num == 0 && id != "0"
+    board.squares.flatten.include?(id_num) ? occupy_square(id_num) : catch_user_error {human_move}
   end
 
   def occupy_square(id, player = self, board_state = board)
@@ -51,23 +62,7 @@ class Player
       coords = board_state.get_position(id)
       board_state.squares[coords.first][coords.last] = player.icon
       board_state.turn_num += 1
-      Player.all.inject(:change_status)
     end
-  end
-
-  def opponent
-    @@all.index(self) == 0 ? @@all[1] : @@all[0]
-  end
-
-  def eval_board
-    # if !board.squares[4].occupied
-    #   spot = board.squares[4]
-    # elsif board.available_corners.any?
-    #   spot = board.available_corners.sample
-    # else
-      get_best_move
-      spot = choice
-    # end
   end
 
   def comp_move
@@ -82,34 +77,5 @@ class Player
     occupy_square(choice)
     puts "#{name} took spot #{choice}."
   end
-
-  # def get_best_move(next_player, depth = 0, best_score = {})
-  #   best_move = nil
-  #   board.copy.available_spaces.each do |free_space|
-  #     free_space.occupied = icon
-  #     if game_is_over(board)
-  #       best_move = as.to_i
-  #       board[as.to_i] = as
-  #       return best_move
-  #     else
-  #       board[as.to_i] = @hum
-  #       if game_is_over(board)
-  #         best_move = as.to_i
-  #         board[as.to_i] = as
-  #         return best_move
-  #       else
-  #         board[as.to_i] = as
-  #       end
-  #     end
-  #   end
-  #   if best_move
-  #     return best_move
-  #   else
-  #     n = rand(0..available_spaces.count)
-  #     return available_spaces[n].to_i
-  #   end
-  # end
-
-
 
 end

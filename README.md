@@ -11,5 +11,7 @@ Keep track of win tallies! Access help menu from anywhere! Quit game at any time
 
 Coming soon...
 - prettier board rendering at larger sizes
+- better tests for minimax
 - colors??
 - customizable icons??
+- ???

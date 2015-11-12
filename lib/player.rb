@@ -4,8 +4,8 @@ require_relative 'input.rb'
 class Player
   include AI
   include Input
-  attr_reader :type, :name
-  attr_accessor :icon, :status, :board
+  attr_reader :type, :name, :icon, :board
+  attr_accessor :status
 
   HUMAN = 0
   EZ_COMPUTER = 1
@@ -30,15 +30,16 @@ class Player
   end
 
   def self.find_by(icon)
-    @@all.find{|player| player.icon == icon}
+    Player.all[0].board.game.players.find {|player| player.icon == icon}
   end
 
   def change_status
-    @status = @status == ACTIVE ? WAITING : ACTIVE
+    @status = status == ACTIVE ? WAITING : ACTIVE
   end
 
   def opponent
-    @@all.index(self) == 0 ? @@all[1] : @@all[0]
+    players = board.game.players
+    players.index(self) == 0 ? players[1] : players[0]
   end
 
   def move

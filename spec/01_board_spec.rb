@@ -104,7 +104,7 @@ describe 'Board' do
 
     describe '#make_copy'
       let(:board_copy) {board.make_copy}
-      let(:player) {Player.new("Sam", board_copy, 0)}
+      let(:player) {Player.new(board_copy, {name: "Sam", type: 0, icon: 'x', status: 0})}
       it 'makes a copy of the board that can be manipulated without changing the original board' do
         expect(board_copy).to_not eq(board)
         expect(board_copy.squares).to eq(board.squares)

@@ -1,7 +1,6 @@
-require 'pry'
 class Board
   attr_reader :dimension
-  attr_accessor :squares, :turn_num, :copy, :winner
+  attr_accessor :squares, :turn_num, :copy, :winner, :game
 
   def initialize(dimension = 3, squares = [], turn_num = 0)
     @dimension = dimension
@@ -41,11 +40,11 @@ class Board
     end
   end
 
-  # CALLBACK HERE?
   def diagonal_win
     diagonal_win_right || diagonal_win_left
   end
 
+  # CALLBACK HERE?
   def diagonal_win_right
     squares_to_compare = []
     dimension.times {|x| squares_to_compare << squares[x][x]}
@@ -95,4 +94,5 @@ class Board
     copy_of_squares = squares.map {|row| row.dup }
     Board.new(dimension, copy_of_squares, turn_num)
   end
+
 end

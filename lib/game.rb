@@ -1,11 +1,13 @@
 class Game
-  attr_accessor :board
+  attr_accessor :board, :players, :player1, :player2
   def initialize
     @board = Board.new
+    @players = []
+    board.game = self
   end
 
-
-  #TODO: make render pretty when board #s are double digits
+  # TODO: make render pretty with dimensions above 3x3
+  # and display numbers are double digits
   def render_board
     i = 0
     while i < board.dimension
@@ -13,18 +15,6 @@ class Game
       #{render_row(i)} """
       i += 1
     end
-
-    # """
-    #   #{ board.dimension.times do |i|
-    #       puts render_row(i)
-    #     end }
-    # """
-
-    # """
-    #   #{render_square(0)}|#{render_square(1)}|#{render_square(2)}
-    #   #{render_square(3)}|#{render_square(4)}|#{render_square(5)}
-    #   #{render_square(6)}|#{render_square(7)}|#{render_square(8)}
-    # """
   end
 
   def render_row(index)
@@ -37,8 +27,23 @@ class Game
     row.join
   end
 
+  def play
+    get_active_player.move
+    switch_active_player
+    puts render_board
+  end
 
+  def get_active_player
+    players.find {|player| player.status == 0}
+  end
 
+  def switch_active_player
+    players.each {|player| player.change_status}
+  end
 
+  def start
+    puts render_board
+    play until board.game_is_over
+  end
 
 end

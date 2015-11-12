@@ -1,4 +1,3 @@
-require 'stringio'
 describe 'Player' do
   before(:each) { Player.class_variable_set :@@all, [] }
   let(:session) {

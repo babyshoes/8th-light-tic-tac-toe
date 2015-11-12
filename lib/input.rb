@@ -1,5 +1,4 @@
 module Input
-
   attr_accessor :game
 
   def get_input

@@ -124,8 +124,8 @@ class CLI
   end
 
   def display_players_info
-    first_player = players.find {|player| player[:status] == 'active'}
-    second_player = players.find {|player| player != first_player}
+    first_player = players_info.find {|player| player[:status] == ACTIVE}
+    second_player = players_info.find {|player| player != first_player}
     puts "#{first_player[:name]}, a #{first_player[:type]}, is up first, playing #{first_player[:icon]}."
     puts "#{second_player[:name]}, a #{second_player[:type]}, is up next, playing #{second_player[:icon]}."
     puts "\n"

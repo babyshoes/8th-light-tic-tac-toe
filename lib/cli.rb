@@ -5,13 +5,10 @@ class CLI
   attr_reader :players_info
   attr_accessor :game, :score, :player1_params, :player2_params
 
-  ACTIVE = 0
-  WAITING = 1
-
   def initialize
     @score = {}
-    @player1_params = {name: "Player 1", type: 0, icon: icons[0], status: ACTIVE}
-    @player2_params = {name: "Player 2", type: 3, icon: icons[1], status: WAITING}
+    @player1_params = {name: "Player 1", type: HUMAN, icon: icons[0], status: ACTIVE}
+    @player2_params = {name: "Player 2", type: PERFECT_COMPUTER, icon: icons[1], status: WAITING}
     @players_info = [@player1_params, @player2_params]
   end
 

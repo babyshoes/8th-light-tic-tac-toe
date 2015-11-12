@@ -7,13 +7,6 @@ class Player
   attr_reader :type, :name, :icon, :board
   attr_accessor :status
 
-  HUMAN = 0
-  EZ_COMPUTER = 1
-  MEDIUM_COMPUTER = 2
-  PERFECT_COMPUTER = 3
-  ACTIVE = 0
-  WAITING = 1
-
   @@all = []
 
   def initialize(board, player_hash = {})
@@ -30,7 +23,7 @@ class Player
   end
 
   def self.find_by(icon)
-    Player.all[0].board.game.players.find {|player| player.icon == icon}
+    Player.all.last.board.game.players.find {|player| player.icon == icon}
   end
 
   def change_status
@@ -40,6 +33,19 @@ class Player
   def opponent
     players = board.game.players
     players.index(self) == 0 ? players[1] : players[0]
+  end
+
+  def comp_move
+    case type
+    when EZ_COMPUTER
+      get_random_move
+    when MEDIUM_COMPUTER
+      get_ok_move
+    when PERFECT_COMPUTER
+      get_best_move
+    end
+    occupy_square(choice)
+    puts "#{name} took spot #{choice}."
   end
 
   def move
@@ -64,19 +70,6 @@ class Player
       board_state.squares[coords.first][coords.last] = player.icon
       board_state.turn_num += 1
     end
-  end
-
-  def comp_move
-    case type
-    when EZ_COMPUTER
-      get_random_move
-    when MEDIUM_COMPUTER
-      get_ok_move
-    when PERFECT_COMPUTER
-      get_best_move
-    end
-    occupy_square(choice)
-    puts "#{name} took spot #{choice}."
   end
 
 end

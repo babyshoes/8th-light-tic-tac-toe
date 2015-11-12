@@ -1,8 +1,6 @@
 module AI
   attr_accessor :choice
 
-  ACTIVE = 0
-
   def dire_conditions_move
   win_immediately = []
   block_win = []
@@ -31,9 +29,9 @@ module AI
 
   def score(board, depth)
     if board.game_is_won
-      return Player.find_by(board.winner).status == ACTIVE ? 100 - depth : depth - 100
+      return Player.find_by(board.winner).status == ACTIVE ? FULL_SCORE - depth : depth - FULL_SCORE
     else
-      return 0
+      return TIE_SCORE
     end
   end
 
@@ -50,11 +48,11 @@ module AI
   end
 
   def get_best_move
-    minimax(board, self)
+    x = minimax(board, self)
   end
 
   def best_move(player, scored_moves)
-    if player.status == 0
+    if player.status == ACTIVE
       scored_moves.max_by { |k,v| v }
     else
       scored_moves.min_by { |k,v| v }

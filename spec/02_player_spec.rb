@@ -1,10 +1,11 @@
+require 'stringio'
 describe 'Player' do
   before(:each) { Player.class_variable_set :@@all, [] }
   let(:session) {
     s = CLI.new
     s.game = Game.new
     s.game.player1 = Player.new(s.game.board, {name: "Diane", type: 0, icon: s.icons[0], status: 1})
-    s.game.player2 = Player.new(s.game.board, {name: "Not Diane", type: 1, icon: s.icons[1], status: 0})
+    s.game.player2 = Player.new(s.game.board, {name: "Not Diane", type: 3, icon: s.icons[1], status: 0})
     s.game.players.push(s.game.player1, s.game.player2)
     s
   }
@@ -46,7 +47,6 @@ describe 'Player' do
 
   describe "#opponent"
     it "selects the other player as this player's opponent" do
-
       expect(session.game.player1.opponent).to eq(session.game.player2)
       expect(session.game.player1.opponent).not_to eq(session.game.player1)
       expect(session.game.player1.opponent.opponent).to eq(session.game.player1)
@@ -55,38 +55,52 @@ describe 'Player' do
   describe "#move"
     it 'increases turn count' do
       expect(session.game.board.turn_num).to eq(0)
-      session.game.player2.move
+      expect(STDOUT).to receive(:puts).with("What's your move? Select available square number.")
+      allow(session.game.player1).to receive(:gets).and_return('0')
+      session.game.player1.move
       expect(session.game.board.turn_num).to eq(1)
     end
 
-
     context 'if type is human'
-      let(:input) {'4'}
       describe '#human_move'
-        xit "moves player's icon to specified square" do
-          allow(STDOUT).to receive(:puts) {"What's your move? Select available square number."}
-          expect(game.player1.pick_square).to eq(true)
-          allow(STDIN).to receive(:gets) {'4'}
-          expect(game.board.squares).to eq([[0, 1, 2], [3, "X", 5], [6, 7, 8]])
+        it "moves player's icon to specified square" do
+          expect(STDOUT).to receive(:puts).with("What's your move? Select available square number.")
+          allow(session.game.player1).to receive(:gets).and_return('4')
+          session.game.player1.human_move
+          expect(session.game.board.squares).to eq([[0, 1, 2], [3, 'x', 5], [6, 7, 8]])
         end
 
+
     context 'if type is perfect AI'
-      describe '#move'
-        it 'will always choose the wi' do
-        # game.board.squares = [["O", "X", "O"], ["X", "X", "O"], [6, 7, 8]]
-        # if comp is "X", it will move to 7. If it is "O", it will move to 8.
+      describe '#minimax'
+        it 'scores board correctly' do
+          session.game.board.squares = [["o", "x", "o"], ["x", "x", "o"], [6, 7, 8]]
+          expect(session.game.player2.minimax(session.game.board, session.game.player2)).to eq(99)
+        end
+
+      describe '#comp_move'
+        it 'chooses winning move when available' do
+          session.game.board.squares = [["o", "x", "o"], ["x", "x", "o"], [6, 7, 8]]
+          expect(STDOUT).to receive(:puts).with("Not Diane took spot 8.")
+          session.game.player2.comp_move
+          expect(session.game.board.squares).to eq([["o", "x", "o"], ["x", "x", "o"], [6, 7, "o"]])
         end
 
     context 'if type is medium-difficulty AI'
-      describe '#medium_move'
+      describe '#comp_move'
         it 'will prioritize winning if given the immediate option' do
-
+          session.game.player2 = Player.new(session.game.board, {name: "Not Diane", type: 2, icon: session.icons[1], status: 0})
+          session.game.board.squares = [["o", "x", "o"], ["x", "x", "o"], [6, 7, 8]]
+          expect(STDOUT).to receive(:puts).with("Not Diane took spot 8.")
+          session.game.player2.comp_move
+          expect(session.game.board.squares).to eq([["o", "x", "o"], ["x", "x", "o"], [6, 7, "o"]])
         end
         it 'will block the other player from winning' do
-
-        end
-        it 'otherwise picks move randomly' do
-
+          session.game.player2 = Player.new(session.game.board, {name: "Not Diane", type: 2, icon: session.icons[1], status: 0})
+          session.game.board.squares = [["x", "o", "x"], ["o", "o", "x"], [6, 7, 8]]
+          expect(STDOUT).to receive(:puts).with("Not Diane took spot 7.")
+          session.game.player2.comp_move
+          expect(session.game.board.squares).to eq([["x", "o", "x"], ["o", "o", "x"], [6, "o", 8]])
         end
 
 end

@@ -14,8 +14,7 @@ module Input
   end
 
   def catch_user_error
-    puts "Sorry, I didn't catch that."
-    puts "\n"
+    puts "Sorry, I didn't catch that.\n"
     yield
   end
 
@@ -30,8 +29,7 @@ module Input
   def instructions
     @game = game
     dimension = game ? game.board.dimension : "a certain number of pieces"
-    puts "Get #{dimension} in a row horizontally, vertically, or diagonally. Tic tac toe, defeat your foe."
-    puts "\n"
+    puts "Get #{dimension} in a row horizontally, vertically, or diagonally. Tic tac toe, defeat your foe.\n"
     help
   end
 
@@ -42,7 +40,7 @@ module Input
   end
 
   def farewell_message
-    ["Goodbye.", "Adieu.", "Aloha.", "( >'.')> <('.'< )"]
+    ["Come again!", "Adieu.", "Aloha.", "( >'.')> <('.'< )"]
   end
 
 

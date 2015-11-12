@@ -11,8 +11,9 @@ describe 'Game' do
   }
 
   describe '#get_active_player'
-    it 'finds single player whose status is active' do
+    it 'finds single player object whose status is active' do
       expect(session.game.get_active_player).to eq(session.game.player2)
+      expect(session.game.get_active_player).to be_a Player
     end
 
   describe '#switch_active_player'
@@ -23,5 +24,6 @@ describe 'Game' do
       expect(session.game.player1.status).to eq(0)
       expect(session.game.player2.status).to eq(1)
     end
+
 
 end

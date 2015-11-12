@@ -34,7 +34,7 @@ class Game
   end
 
   def get_active_player
-    players.find {|player| player.status == 0}
+    players.find {|player| player.status == ACTIVE}
   end
 
   def switch_active_player
